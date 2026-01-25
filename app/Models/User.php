@@ -12,16 +12,13 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+
     /**
      * The attributes that are mass assignable.
      *
      * @var list<string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $fillable = ['name','email','password','role'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -44,5 +41,16 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * 
+     * 
+     */
+
+    // علاقة المستخدم بالطلبات (One-to-Many)
+    public function orders()
+    {
+        return $this->hasMany(Order::class, 'User_ID', 'User_ID');
     }
 }
