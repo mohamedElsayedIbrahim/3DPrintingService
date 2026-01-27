@@ -1,69 +1,72 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\File3D;
-use App\Models\PrintSetting;
+use App\Models\DesignFile;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
-    // عرض كل الطلبات للمستخدم
+    // الصفحة الرئيسية + الفورم
     public function index()
     {
-        $orders = auth('web')->user()->orders;
+        return view('home');
+    }
+
+    // عرض الطلبات
+    public function orders()
+    {
+        $orders = Order::latest()->get();
         return view('orders.index', compact('orders'));
     }
 
-    // عرض صفحة إنشاء طلب جديد
-    public function create()
-    {
-        return view('orders.create');
-    }
-
-    // معالجة إنشاء الطلب
+    // حفظ طلب جديد
     public function store(Request $request)
     {
         $request->validate([
-            'files.*'=>'required|file',
-            'Material_ID'=>'required|exists:materials,Material_ID',
-            'Color'=>'required|string',
-            'Quality'=>'required|string',
-            'Quantity'=>'required|integer|min:1'
+            'full_name' => 'required|string|max:255',
+            'email' => 'required|email',
+            'phone' => 'required',
+            'project_description' => 'required',
+            'material' => 'required',
+            'quantity' => 'required|integer|min:1',
+            'design_file' => 'required|file|mimes:stl,obj,3mf'
         ]);
 
         $order = Order::create([
-            'User_ID'=>auth('web')->id(),
-            'Order_Status'=>'Pending',
-            'Total_Price'=>100, // يمكن تعديلها لاحقاً لحساب السعر ديناميكي
-            'Order_Date'=>now()
+            'full_name' => $request->full_name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'city' => $request->city,
+            'project_description' => $request->project_description,
+            'material' => $request->material,
+            'quantity' => $request->quantity,
+            'delivery_date' => $request->delivery_date,
+            'notes' => $request->notes,
+            'status' => 'قيد المراجعة',
+            'total_cost' => $request->total_cost ?? 0
         ]);
 
-        // حفظ الملفات
-        foreach($request->file('files') as $file){
-    $fileModel = new File3D();
-    $fileModel->Order_ID = $order->Order_ID;
-    $fileModel->File_Name = $file->getClientOriginalName();
+        // رفع الملف
+        if ($request->hasFile('design_file')) {
+            $path = $request->file('design_file')->store('design_files', 'public');
 
-    // حفظ الملف في storage/app/uploads
-    $fileModel->File_Path = $file->store('uploads');
+            DesignFile::create([
+                'order_id' => $order->id,
+                'file_path' => $path,
+                'file_type' => $request->file('design_file')->getClientOriginalExtension()
+            ]);
+        }
 
-    // حجم الملف بالميجابايت
-    $fileModel->File_Size = round($file->getSize() / 1024 / 1024, 2);
-    $fileModel->save();
-}
+        return redirect()->back()->with('success', 'تم إرسال الطلب بنجاح');
+    }
 
-
-        // حفظ إعدادات الطباعة
-        PrintSetting::create([
-            'Order_ID'=>$order->Order_ID,
-            'Material_ID'=>$request->Material_ID,
-            'Color'=>$request->Color,
-            'Quality'=>$request->Quality,
-            'Quantity'=>$request->Quantity
-        ]);
-
-        return redirect()->route('orders.index')->with('success','Order created successfully');
+    // حذف طلب
+    public function destroy(Order $order)
+    {
+        $order->delete();
+        return redirect()->back()->with('success', 'تم حذف الطلب');
     }
 }
