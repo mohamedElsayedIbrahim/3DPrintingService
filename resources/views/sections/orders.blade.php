@@ -91,7 +91,7 @@
               const stlLoader = new STLLoaderPlugin(viewer);
               stlLoader.load({
                 id: "model-{{ $order->id }}",
-                src: "{{ asset('storage/'.$order->file_path) }}",
+                src: "{{ route('orders.download', $order) }}",
                 edges: true,
                 lit: true
               });
@@ -99,7 +99,7 @@
               const objLoader = new OBJLoaderPlugin(viewer);
               objLoader.load({
                 id: "model-{{ $order->id }}",
-                src: "{{ asset('storage/'.$order->file_path) }}",
+                src: "{{ route('orders.download', $order) }}",
                 edges: true,
                 lit: true
               });
