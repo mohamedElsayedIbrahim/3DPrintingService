@@ -1,22 +1,10 @@
-@extends('layouts.app')
+@extends('layouts.admin')
 
 @section('content')
-<div class="flex min-h-screen bg-gray-100">
 
-    {{-- Sidebar --}}
-    <aside class="w-64 bg-white shadow-lg">
-        <div class="p-6">
-            <h2 class="text-xl font-bold text-gray-800 mb-6">لوحة الإدارة</h2>
-            <nav class="space-y-2">
-                <a href="{{ route('dashboard') }}" class="block px-4 py-2 rounded hover:bg-gray-200 {{ request()->is('admin/dashboard') ? 'bg-gray-200' : '' }}">
-                    Dashboard
-                </a>
-                <a href="#" class="block px-4 py-2 rounded hover:bg-gray-200">Users</a>
-            </nav>
-        </div>
-    </aside>
+ 
 
-    {{-- Main content --}}
+    {{-- المحتوى الرئيسي --}}
     <div class="flex-1 p-6">
         <header class="flex justify-between items-center mb-6">
             <h1 class="text-3xl font-bold">لوحة التحكم</h1>
@@ -24,12 +12,12 @@
                 <span class="text-gray-700">{{ auth()->user()->name }}</span>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
-                    <button type="submit" class="text-red-600 hover:underline text-sm">Logout</button>
+                    <button type="submit" class="text-red-600 hover:underline text-sm">تسجيل الخروج</button>
                 </form>
             </div>
         </header>
 
-        {{-- Orders Table --}}
+        {{-- جدول الطلبات --}}
         <div class="bg-white rounded-xl shadow p-6">
             <h2 class="text-2xl font-bold mb-4">الطلبات الأخيرة</h2>
 
@@ -39,8 +27,8 @@
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-4 py-2 text-right text-sm font-medium text-gray-700">ID</th>
-                            <th class="px-4 py-2 text-right text-sm font-medium text-gray-700">الاسم</th>
+                            <th class="px-4 py-2 text-right text-sm font-medium text-gray-700">الرقم</th>
+                            <th class="px-4 py-2 text-right text-sm font-medium text-gray-700">اسم العميل</th>
                             <th class="px-4 py-2 text-right text-sm font-medium text-gray-700">المادة</th>
                             <th class="px-4 py-2 text-right text-sm font-medium text-gray-700">الكمية</th>
                             <th class="px-4 py-2 text-right text-sm font-medium text-gray-700">الحالة</th>
@@ -70,11 +58,11 @@
                             </td>
                             <td class="px-4 py-2 text-right">{{ $order->created_at->format('Y-m-d') }}</td>
                             <td class="px-4 py-2 text-center space-x-2">
-                                <a href="{{ route('orders.download', $order) }}" class="text-purple-600 hover:underline text-sm">Download</a>
-                                <form method="POST" action="{{ route('orders.destroy', $order) }}" class="inline-block" onsubmit="return confirm('هل أنت متأكد؟')">
+                                <a href="{{ route('orders.download', $order) }}" class="text-purple-600 hover:underline text-sm">تحميل</a>
+                                <form method="POST" action="{{ route('orders.destroy', $order) }}" class="inline-block" onsubmit="return confirm('هل أنت متأكد من الحذف؟')">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-red-600 hover:underline text-sm">Delete</button>
+                                    <button type="submit" class="text-red-600 hover:underline text-sm">حذف</button>
                                 </form>
                             </td>
                         </tr>
@@ -84,5 +72,5 @@
             @endif
         </div>
     </div>
-</div>
+
 @endsection

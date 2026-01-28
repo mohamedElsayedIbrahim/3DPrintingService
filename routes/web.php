@@ -40,4 +40,9 @@ Route::middleware('auth')->group(function(){
 Route::middleware([AdminMiddleware::class])->group(function () {
     Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
+    Route::get('/admin/users', [AdminController::class, 'users'])->name('admin.users');
+Route::get('/admin/users/create', [AdminController::class, 'createUser'])->name('admin.users.create');
+    Route::post('/admin/users', [AdminController::class, 'storeUser'])->name('admin.users.store');
+
+
 });
