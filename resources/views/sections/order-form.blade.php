@@ -12,37 +12,36 @@
             @csrf
 
             {{-- Full Name --}}
-<div>
-    <label class="block text-sm font-medium mb-1">الاسم الكامل</label>
+            <div>
+                <label class="block text-sm font-medium mb-1">الاسم الكامل</label>
+                <input
+                    type="text"
+                    value="{{ auth()->user()->name }}"
+                    disabled
+                    class="w-full border p-3 rounded bg-gray-100 text-gray-600 cursor-not-allowed"
+                >
+                <input type="hidden" name="full_name" value="{{ auth()->user()->name }}">
+            </div>
 
-    <input
-        type="text"
-        value="{{ auth()->user()->name }}"
-        disabled
-        class="w-full border p-3 rounded bg-gray-100 text-gray-600 cursor-not-allowed"
-    >
+            {{-- Email --}}
+            <div>
+                <label class="block text-sm font-medium mb-1">البريد الإلكتروني</label>
+                <input
+                    type="email"
+                    value="{{ auth()->user()->email }}"
+                    disabled
+                    class="w-full border p-3 rounded bg-gray-100 text-gray-600 cursor-not-allowed"
+                >
+                <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+            </div>
 
-    <input type="hidden" name="full_name" value="{{ auth()->user()->name }}">
-</div>
-
-{{-- Email --}}
-<div>
-    <label class="block text-sm font-medium mb-1">البريد الإلكتروني</label>
-
-    <input
-        type="email"
-        value="{{ auth()->user()->email }}"
-        disabled
-        class="w-full border p-3 rounded bg-gray-100 text-gray-600 cursor-not-allowed"
-    >
-
-    <input type="hidden" name="email" value="{{ auth()->user()->email }}">
-</div>
-
-
+            {{-- Phone --}}
             <input name="phone" placeholder="رقم الجوال" class="w-full border p-3 rounded">
+
+            {{-- Description --}}
             <textarea name="description" placeholder="وصف المشروع" class="w-full border p-3 rounded"></textarea>
 
+            {{-- Material --}}
             <select name="material" class="w-full border p-3 rounded">
                 <option value="PLA">PLA</option>
                 <option value="ABS">ABS</option>
@@ -50,32 +49,28 @@
                 <option value="Resin">Resin</option>
             </select>
 
+            {{-- Quantity --}}
             <input name="quantity" type="number" value="1" class="w-full border p-3 rounded">
+
+            {{-- Delivery Date --}}
             <input name="delivery_at" type="date" class="w-full border p-3 rounded">
+
+            {{-- Notes --}}
             <textarea name="notes" placeholder="ملاحظات" class="w-full border p-3 rounded"></textarea>
 
             {{-- File upload --}}
             <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700">
-                    ملف التصميم (STL / OBJ)
-                </label>
+                <label class="block text-sm font-medium text-gray-700">ملف التصميم (STL / OBJ)</label>
 
                 <div
                     class="flex items-center justify-between border-2 border-dashed rounded-lg p-4 cursor-pointer hover:border-purple-500 transition"
                     onclick="document.getElementById('fileInput').click()"
                 >
-                    <span id="fileName" class="text-gray-500">
-                        لم يتم اختيار ملف
-                    </span>
-
-                    <span class="bg-purple-600 text-white px-4 py-2 rounded text-sm">
-                        اختيار ملف
-                    </span>
+                    <span id="fileName" class="text-gray-500">لم يتم اختيار ملف</span>
+                    <span class="bg-purple-600 text-white px-4 py-2 rounded text-sm">اختيار ملف</span>
                 </div>
 
-                <p class="text-xs text-gray-500">
-                    الصيغ المدعومة: STL, OBJ — الحد الأقصى: 20MB
-                </p>
+                <p class="text-xs text-gray-500">الصيغ المدعومة: STL, OBJ — الحد الأقصى: 20MB</p>
 
                 <input
                     id="fileInput"
@@ -87,6 +82,7 @@
                 />
             </div>
 
+            {{-- Submit Button --}}
             <button class="w-full bg-purple-600 text-white py-3 rounded">
                 إرسال الطلب
             </button>
@@ -122,9 +118,7 @@
     from { transform: scale(.9); opacity: 0 }
     to { transform: scale(1); opacity: 1 }
 }
-.animate-scale {
-    animation: scale .2s ease-out;
-}
+.animate-scale { animation: scale .2s ease-out; }
 </style>
 
 @push('scripts')
@@ -153,12 +147,13 @@ function showFileName(input) {
     fileNameSpan.classList.remove('text-red-600');
 }
 
-// ---------- Submit ----------
+// ---------- Submit with Loading ----------
 document.getElementById('orderForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
     const form = this;
     const fileInput = document.getElementById('fileInput');
+    const submitBtn = form.querySelector('button');
 
     if (!fileInput.files.length) {
         showError('برجاء اختيار ملف STL أو OBJ');
@@ -172,6 +167,17 @@ document.getElementById('orderForm').addEventListener('submit', async function (
     }
 
     const formData = new FormData(form);
+
+    // 🔹 Show loading spinner
+    submitBtn.disabled = true;
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = `
+        <svg class="animate-spin h-5 w-5 text-white inline-block mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+        </svg>
+        جاري إرسال الطلب...
+    `;
 
     try {
         const response = await fetch(form.action, {
@@ -209,6 +215,10 @@ document.getElementById('orderForm').addEventListener('submit', async function (
 
     } catch {
         showError('فشل الاتصال بالسيرفر');
+    } finally {
+        // 🔹 Reset button
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
     }
 });
 
@@ -236,6 +246,9 @@ function showError(msg) {
 
 function showSuccess(msg) {
     showModal('تم بنجاح', msg, 'success');
+    setTimeout(() => {
+        window.location.reload();
+    }, 500);
 }
 </script>
 @endpush

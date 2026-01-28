@@ -6,9 +6,7 @@
 <div class="min-h-screen flex items-center justify-center bg-gray-100">
     <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-lg">
 
-        <h2 class="text-2xl font-bold mb-6 text-center">
-            تسجيل الدخول
-        </h2>
+        <h2 class="text-2xl font-bold mb-6 text-center">تسجيل الدخول</h2>
 
         {{-- Laravel Errors --}}
         @if ($errors->any())
@@ -115,9 +113,13 @@
 
             <button
                 type="submit"
-                class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700"
+                class="w-full bg-purple-600 text-white py-2 rounded hover:bg-purple-700 flex justify-center items-center"
             >
-                إرسال رابط إعادة التعيين
+                <span id="forgotButtonText">إرسال رابط إعادة التعيين</span>
+                <svg id="forgotLoading" class="animate-spin h-5 w-5 text-white ml-2 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+                </svg>
             </button>
         </form>
     </div>
@@ -134,6 +136,7 @@
 }
 </style>
 
+{{-- ================= SCRIPTS ================= --}}
 <script>
 /* ================= LOGIN VALIDATION ================= */
 document.getElementById('loginForm').addEventListener('submit', function (e) {
@@ -179,6 +182,8 @@ document.getElementById('forgotForm').addEventListener('submit', async function 
     const form = this;
     const errorBox = document.getElementById('forgotError');
     const successBox = document.getElementById('forgotSuccess');
+    const buttonText = document.getElementById('forgotButtonText');
+    const loading = document.getElementById('forgotLoading');
 
     errorBox.classList.add('hidden');
     successBox.classList.add('hidden');
@@ -190,6 +195,10 @@ document.getElementById('forgotForm').addEventListener('submit', async function 
         errorBox.classList.remove('hidden');
         return;
     }
+
+    // 🔹 Show loading
+    buttonText.classList.add('hidden');
+    loading.classList.remove('hidden');
 
     try {
         const response = await fetch(form.action, {
@@ -204,7 +213,6 @@ document.getElementById('forgotForm').addEventListener('submit', async function 
 
         const data = await response.json();
 
-        // ❌ Validation / Error
         if (!response.ok) {
             errorBox.textContent =
                 data.message || 'حدث خطأ أثناء إرسال الرابط';
@@ -219,7 +227,6 @@ document.getElementById('forgotForm').addEventListener('submit', async function 
 
         form.reset();
 
-        // ⏳ اغلاق المودال بعد ثانيتين
         setTimeout(() => {
             closeForgotModal();
             successBox.classList.add('hidden');
@@ -228,8 +235,11 @@ document.getElementById('forgotForm').addEventListener('submit', async function 
     } catch (err) {
         errorBox.textContent = 'فشل الاتصال بالسيرفر';
         errorBox.classList.remove('hidden');
+    } finally {
+        // 🔹 Hide loading
+        loading.classList.add('hidden');
+        buttonText.classList.remove('hidden');
     }
 });
 </script>
-
 @endsection
