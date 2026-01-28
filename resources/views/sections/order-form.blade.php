@@ -11,8 +11,35 @@
         >
             @csrf
 
-            <input name="full_name" placeholder="الاسم الكامل" class="w-full border p-3 rounded">
-            <input name="email" type="email" placeholder="البريد الإلكتروني" class="w-full border p-3 rounded">
+            {{-- Full Name --}}
+<div>
+    <label class="block text-sm font-medium mb-1">الاسم الكامل</label>
+
+    <input
+        type="text"
+        value="{{ auth()->user()->name }}"
+        disabled
+        class="w-full border p-3 rounded bg-gray-100 text-gray-600 cursor-not-allowed"
+    >
+
+    <input type="hidden" name="full_name" value="{{ auth()->user()->name }}">
+</div>
+
+{{-- Email --}}
+<div>
+    <label class="block text-sm font-medium mb-1">البريد الإلكتروني</label>
+
+    <input
+        type="email"
+        value="{{ auth()->user()->email }}"
+        disabled
+        class="w-full border p-3 rounded bg-gray-100 text-gray-600 cursor-not-allowed"
+    >
+
+    <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+</div>
+
+
             <input name="phone" placeholder="رقم الجوال" class="w-full border p-3 rounded">
             <textarea name="description" placeholder="وصف المشروع" class="w-full border p-3 rounded"></textarea>
 

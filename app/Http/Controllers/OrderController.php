@@ -13,7 +13,10 @@ class OrderController extends Controller
      */
     public function index()
     {
-        $orders = Order::latest()->get();
+        $orders = Order::where('user_id', auth('web')->id())
+               ->latest()
+               ->get();
+
 
         return view('home', compact('orders'));
     }
@@ -62,6 +65,7 @@ class OrderController extends Controller
         'file_path'   => $filePath,
         'status'      => 'pending',
         'cost'        => 0,
+        'user_id'     => auth('web')->id(),
     ]);
 
     // ✅ لو الطلب AJAX
@@ -82,13 +86,18 @@ class OrderController extends Controller
      * حذف طلب
      */
     public function destroy(Order $order)
-    {
-        if ($order->file_path) {
-            Storage::disk('public')->delete($order->file_path);
-        }
-
-        $order->delete();
-
-        return back()->with('success', 'تم حذف الطلب');
+{
+    if ($order->user_id !== auth('web')->id()) {
+        abort(403);
     }
+
+    if ($order->file_path) {
+        Storage::disk('public')->delete($order->file_path);
+    }
+
+    $order->delete();
+
+    return back()->with('success', 'تم حذف الطلب');
+}
+
 }

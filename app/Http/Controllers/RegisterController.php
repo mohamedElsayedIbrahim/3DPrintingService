@@ -29,7 +29,7 @@ class RegisterController extends Controller
             'name'     => $validated['name'],
             'email'    => $validated['email'],
             'password' => Hash::make($validated['password']),
-            'role'=>'user',
+            'role'=>'customer',
         ]);
 
         Auth::login($user); // تسجيل الدخول تلقائياً بعد التسجيل

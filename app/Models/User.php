@@ -51,6 +51,6 @@ class User extends Authenticatable
     // علاقة المستخدم بالطلبات (One-to-Many)
     public function orders()
     {
-        return $this->hasMany(Order::class, 'User_ID', 'User_ID');
+        return $this->hasMany(Order::class);
     }
 }
