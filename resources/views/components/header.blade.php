@@ -16,8 +16,11 @@
 
             {{-- يظهروا فقط لو المستخدم مسجل --}}
             @auth
+        @if (auth()->user()->role === 'customer')
+          
                 <a href="#order" class="hover:opacity-80 transition">طلب جديد</a>
                 <a href="#orders" class="hover:opacity-80 transition">طلباتي</a>
+                @endif
             @endauth
         </nav>
 
@@ -41,6 +44,13 @@
                 <span class="text-sm opacity-90">
                     مرحباً، {{ auth()->user()->name }}
                 </span>
+
+                @if (auth()->user()->role === 'admin')
+                    <a href="{{ route('dashboard') }}"
+                   class="px-4 py-2 bg-white text-purple-600 rounded-lg font-semibold hover:bg-gray-100 transition">
+                    لوحة التحكم
+                </a>
+                @endif
 
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

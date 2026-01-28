@@ -9,8 +9,12 @@
 
     {{-- للمستخدمين المسجلين --}}
     @auth
+        @if (auth()->user()->role === 'customer')
+            
         @include('sections.order-form')
         @include('sections.orders')
+        @endif
+
     @endauth
 
     {{-- للمستخدمين غير المسجلين --}}
