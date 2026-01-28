@@ -27,6 +27,7 @@ Route::post('/register', [RegisterController::class, 'register']);
 Route::middleware('auth')->group(function(){
     Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
     Route::delete('/orders/{order}', [OrderController::class, 'destroy'])->name('orders.destroy');
+    Route::get('/orders/download/{order}', [OrderController::class, 'download'])->name('orders.download');
 
     // صفحة تسجيل الخروج
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

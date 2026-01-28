@@ -50,7 +50,11 @@ class OrderController extends Controller
     }
 
     // رفع الملف
-    $filePath = $request->file('file')->store('orders', 'public');
+    $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+    $extension = $file->getClientOriginalExtension();
+
+    // Save in "orders" folder with original extension
+    $filePath = $file->storeAs('orders', $originalName.'.'.$extension, 'public');
 
     Order::create([
         'full_name'   => $validated['full_name'],
@@ -99,5 +103,33 @@ class OrderController extends Controller
 
     return back()->with('success', 'تم حذف الطلب');
 }
+
+// downlaod
+public function download(Order $order)
+{
+    // Ensure the user owns the file
+    if ($order->user_id !== auth('web')->id()) {
+        abort(403);
+    }
+
+    $path = storage_path('app/public/' . $order->file_path);
+
+    if (!file_exists($path)) {
+        abort(404);
+    }
+
+    // Detect extension and proper MIME
+    $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+    $mime = match($extension) {
+        'stl' => 'model/stl',
+        'obj' => 'text/plain',
+        default => 'application/octet-stream'
+    };
+
+    return response()->download($path, basename($path), [
+        'Content-Type' => $mime
+    ]);
+}
+
 
 }
