@@ -12,7 +12,7 @@
                     <i class="fas {{ $service['icon'] }} text-5xl text-purple-600 mb-4"></i>
                     <h3 class="text-xl font-bold">{{ $service['title'] }}</h3>
                     <p class="text-purple-600 font-bold mt-2">
-                        {{ $service['price'] }} ريال / سم³
+                        {{ $service['price'] }} جنية مصرى / سم³
                     </p>
                 </div>
             @endforeach

@@ -6,10 +6,10 @@
                 <div>
                     <label class="block text-gray-700 font-bold mb-2">نوع المادة</label>
                     <select id="material" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:border-purple-500">
-                        <option value="50">PLA - 50 ريال/سم³</option>
-                        <option value="60">ABS - 60 ريال/سم³</option>
-                        <option value="70">PETG - 70 ريال/سم³</option>
-                        <option value="100">Resin - 100 ريال/سم³</option>
+                        <option value="50">PLA - 50 جنيه مصري/سم³</option>
+                        <option value="60">ABS - 60 جنيه مصري/سم³</option>
+                        <option value="70">PETG - 70 جنيه مصري/سم³</option>
+                        <option value="100">Resin - 100 جنيه مصري/سم³</option>
                     </select>
                 </div>
                 <div>
@@ -29,7 +29,7 @@
                     <div class="space-y-2">
                         <label class="flex items-center">
                             <input type="checkbox" id="postProcessing" class="ml-2">
-                            <span>معالجة بعد الطباعة (+30 ريال)</span>
+                            <span>معالجة بعد الطباعة (+30 جنيه مصري)</span>
                         </label>
                         <label class="flex items-center">
                             <input type="checkbox" id="express" class="ml-2">
@@ -44,8 +44,42 @@
             </button>
             <div id="costResult" class="mt-6 p-4 bg-purple-50 rounded-lg hidden">
                 <h3 class="font-bold text-lg mb-2">التكلفة الإجمالية:</h3>
-                <p class="text-3xl font-bold text-purple-600"><span id="totalCost">0</span> ريال</p>
+                <p class="text-3xl font-bold text-purple-600"><span id="totalCost">0</span> جنيه مصري</p>
             </div>
         </div>
     </div>
 </section>
+
+@push('scripts')
+<script>
+function calculateCost() {
+    // جمع القيم
+    const materialPrice = parseFloat(document.getElementById('material').value);
+    const volume = parseFloat(document.getElementById('volume').value);
+    const qualityMultiplier = parseFloat(document.getElementById('quality').value);
+
+    const postProcessing = document.getElementById('postProcessing').checked;
+    const express = document.getElementById('express').checked;
+
+    // التحقق من الحجم
+    if (isNaN(volume) || volume <= 0) {
+        alert('برجاء إدخال حجم صالح');
+        return;
+    }
+
+    // حساب التكلفة الأساسية
+    let cost = volume * materialPrice * qualityMultiplier;
+
+    // إضافة الخدمات الإضافية
+    if (postProcessing) cost += 30;
+    if (express) cost *= 1.5;
+
+    // تقريب للعدد العشري
+    cost = Math.round(cost * 100) / 100;
+
+    // عرض النتيجة
+    document.getElementById('totalCost').textContent = cost;
+    document.getElementById('costResult').classList.remove('hidden');
+}
+</script>
+@endpush
