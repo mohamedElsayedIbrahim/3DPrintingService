@@ -43,22 +43,22 @@
               </span>
             </p>
 
-            {{-- STL / OBJ Viewer --}}
+            {{-- 3D Viewer --}}
             <div class="relative w-full h-64 mb-4 border rounded">
               <div id="loader-{{ $order->id }}" class="absolute inset-0 flex items-center justify-center bg-white z-10">
                 <img src="{{ asset('images/loader.gif') }}" alt="loading" class="w-12 h-12">
               </div>
-
-              <canvas id="stl-canvas-{{ $order->id }}" class="w-full h-full"></canvas>
-
-              {{-- Download Original File --}}
-              <a href="{{ route('orders.download', $order) }}"
-   class="text-purple-600 hover:underline text-sm mb-2 inline-block">
-   تحميل الملف (STL / OBJ)
-</a>
+              <canvas id="xeokit-canvas-{{ $order->id }}" class="w-full h-full"></canvas>
             </div>
 
-            {{-- Delete Button (only pending) --}}
+            {{-- Download original file --}}
+            <a href="{{ route('orders.download', $order) }}"
+               target="_blank"
+               class="text-purple-600 hover:underline text-sm mb-2 inline-block">
+              تحميل الملف الأصلي (STL / OBJ)
+            </a>
+
+            {{-- Delete button --}}
             @if($order->status === 'pending')
               <form method="POST" action="{{ route('orders.destroy', $order) }}"
                     onsubmit="return confirm('هل أنت متأكد من حذف الطلب؟')"
@@ -70,27 +70,45 @@
             @endif
           </div>
 
-          {{-- Initialize STL Viewer --}}
-          <script src="{{ asset('js/stl_viewer/stl_viewer.min.js') }}"></script>
-          <script>
-            document.addEventListener('DOMContentLoaded', function () {
-              const canvas = document.getElementById('stl-canvas-{{ $order->id }}');
-              const loaderDiv = document.getElementById('loader-{{ $order->id }}');
+          {{-- Xeokit STL/OBJ Viewer --}}
+          <script type="module">
+            import {Viewer} from "https://cdn.jsdelivr.net/npm/@xeokit/xeokit-sdk/dist/xeokit-sdk.es.min.js";
+            import {STLLoaderPlugin} from "https://cdn.jsdelivr.net/npm/@xeokit/xeokit-sdk/dist/xeokit-sdk.es.min.js";
+            import {OBJLoaderPlugin} from "https://cdn.jsdelivr.net/npm/@xeokit/xeokit-sdk/dist/xeokit-sdk.es.min.js";
 
-              const viewer = new StlViewer(canvas, {
-                models: [
-                  {
-                    filename: "{{ asset('storage/'.$order->file_path) }}",
-                    color: '#888888'
-                  }
-                ],
-                background: '#ffffff',
-                rotate: true
-              });
+            const canvas = document.getElementById('xeokit-canvas-{{ $order->id }}');
+            const loaderDiv = document.getElementById('loader-{{ $order->id }}');
 
-              // Hide loader after the model is rendered
-              setTimeout(() => loaderDiv.style.display = 'none', 1000);
+            const viewer = new Viewer({
+              canvasId: canvas.id,
+              transparent: true
             });
+            
+
+            const fileExt = "{{ pathinfo($order->file_path, PATHINFO_EXTENSION) }}".toLowerCase();
+
+            if (fileExt === 'stl') {
+              const stlLoader = new STLLoaderPlugin(viewer);
+              stlLoader.load({
+                id: "model-{{ $order->id }}",
+                src: "{{ asset('storage/'.$order->file_path) }}",
+                edges: true,
+                lit: true
+              });
+            } else if (fileExt === 'obj') {
+              const objLoader = new OBJLoaderPlugin(viewer);
+              objLoader.load({
+                id: "model-{{ $order->id }}",
+                src: "{{ asset('storage/'.$order->file_path) }}",
+                edges: true,
+                lit: true
+              });
+            } else {
+              loaderDiv.innerHTML = "نوع الملف غير مدعوم";
+            }
+
+            // Hide loader after 2s (or after model loaded if plugin provides event)
+            setTimeout(() => loaderDiv.style.display = 'none', 2000);
           </script>
 
         @endforeach
