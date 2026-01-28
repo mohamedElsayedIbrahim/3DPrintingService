@@ -47,7 +47,34 @@
     <input name="delivery_at" type="date" class="w-full border p-3 rounded">
     <textarea name="notes" placeholder="ملاحظات" class="w-full border p-3 rounded"></textarea>
 
-    <input name="file" type="file" required class="w-full border p-3 rounded">
+    <div class="space-y-2">
+    <label class="block text-sm font-medium text-gray-700">
+        ملف التصميم (STL / OBJ)
+    </label>
+
+    <div
+        class="flex items-center justify-between border-2 border-dashed rounded-lg p-4 cursor-pointer hover:border-purple-500 transition"
+        onclick="document.getElementById('fileInput').click()"
+    >
+        <span id="fileName" class="text-gray-500">
+            لم يتم اختيار ملف
+        </span>
+
+        <span class="bg-purple-600 text-white px-4 py-2 rounded text-sm">
+            اختيار ملف
+        </span>
+    </div>
+
+    <input
+        id="fileInput"
+        name="file"
+        type="file"
+        required
+        class="hidden"
+        onchange="showFileName(this)"
+    />
+</div>
+
 
     <button class="w-full bg-purple-600 text-white py-3 rounded">
         إرسال الطلب
@@ -60,6 +87,15 @@
 
 @push('scripts')
     <script>
+        
+        function showFileName(input) {
+    const fileName = input.files.length
+        ? input.files[0].name
+        : 'لم يتم اختيار ملف';
+
+    document.getElementById('fileName').textContent = fileName;
+}
+
 document.getElementById('orderForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
