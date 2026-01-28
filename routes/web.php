@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\NewPasswordController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PasswordResetLinkController;
+use App\Http\Middleware\AdminMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [OrderController::class, 'index'])->name('home');
@@ -31,5 +33,11 @@ Route::middleware('auth')->group(function(){
 
     // صفحة تسجيل الخروج
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+});
+
+
+Route::middleware([AdminMiddleware::class])->group(function () {
+    Route::get('/admin/dashboard', [AdminController::class, 'index'])->name('dashboard');
 
 });

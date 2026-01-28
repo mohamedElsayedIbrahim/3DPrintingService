@@ -16,21 +16,29 @@ class LoginController extends Controller
 
     // تسجيل الدخول
     public function login(Request $request)
-    {
-        $credentials = $request->validate([
-            'email'    => 'required|email',
-            'password' => 'required|string',
-        ]);
+{
+    $credentials = $request->validate([
+        'email'    => 'required|email',
+        'password' => 'required|string',
+    ]);
 
-        if (Auth::attempt($credentials, $request->filled('remember'))) {
-            $request->session()->regenerate();
-            return redirect()->intended('/'); // إعادة التوجيه للصفحة الرئيسية
+    if (Auth::attempt($credentials, $request->filled('remember'))) {
+        $request->session()->regenerate();
+
+        // التحقق من نوع المستخدم
+        $user = Auth::user();
+        if ($user->role === 'admin') {
+            return redirect()->route('dashboard'); // صفحة الادمن
+        } else {
+            return redirect()->intended('/'); // صفحة الزبون
         }
-
-        return back()->withErrors([
-            'email' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
-        ])->onlyInput('email');
     }
+
+    return back()->withErrors([
+        'email' => 'البريد الإلكتروني أو كلمة المرور غير صحيحة.',
+    ])->onlyInput('email');
+}
+
 
     // تسجيل الخروج
     public function logout(Request $request)
