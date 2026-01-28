@@ -1,5 +1,6 @@
 <header class="gradient-bg text-white shadow-lg">
     <div class="container mx-auto px-4 py-6 flex justify-between items-center">
+        <a href="/">
         {{-- Logo --}}
         <div class="flex items-center space-x-reverse space-x-4">
             <i class="fas fa-cube text-3xl"></i>
@@ -8,11 +9,12 @@
                 <p class="text-sm opacity-90">نظام طلب الخدمات الذكي</p>
             </div>
         </div>
+        </a>
 
         {{-- Navigation --}}
         <nav class="hidden md:flex items-center space-x-reverse space-x-6">
-            <a href="#services" class="hover:opacity-80 transition">الخدمات</a>
-            <a href="#calculator" class="hover:opacity-80 transition">حاسبة التكلفة</a>
+            <a href="/#services" class="hover:opacity-80 transition">الخدمات</a>
+            <a href="/#calculator" class="hover:opacity-80 transition">حاسبة التكلفة</a>
 
             {{-- يظهروا فقط لو المستخدم مسجل --}}
             @auth
